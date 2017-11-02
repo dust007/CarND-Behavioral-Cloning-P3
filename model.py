@@ -1,5 +1,4 @@
 import csv
-import cv2
 from PIL import Image
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Dropout, Lambda, Cropping2D
@@ -44,7 +43,7 @@ aug_images, aug_measures = [], []
 for image, measure in zip(images, measures):
     aug_images.append(image)
     aug_measures.append(measure)
-    aug_images.append(cv2.flip(image, 1))
+    aug_images.append(np.fliplr(image))
     aug_measures.append(measure*-1.0)
 
 X_train = np.array(aug_images)
@@ -76,13 +75,13 @@ model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam')
 # checkpoint
 filepath="weights-{epoch:02d}-{val_loss:.4f}.h5"
-checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1,
+                             save_best_only=True, mode='min')
 callbacks_list = [checkpoint]
 
-history = model.fit(X_train, y_train,
-          nb_epoch=20, batch_size=128,
-          validation_split=0.2, shuffle=True,
-          callbacks=callbacks_list, verbose=1)
+history = model.fit(X_train, y_train, nb_epoch=20, batch_size=128,
+                    validation_split=0.2, shuffle=True,
+                    callbacks=callbacks_list, verbose=1)
 
 # save train loss and valid loss plot
 pyplot.plot(history.history['loss'], label='train')
