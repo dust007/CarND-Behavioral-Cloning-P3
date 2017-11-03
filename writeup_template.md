@@ -20,6 +20,8 @@ The goals / steps of this project are the following:
 [image2]: ./examples/right.jpg "Right"
 [image3]: ./examples/left.jpg "Left"
 [image4]: ./examples/center_flip.png "Center Flip"
+[image5]: ./loss_hist.png "train valid loss plot"
+
 ## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
@@ -53,7 +55,7 @@ I chose LeNet as a starting point and then used a combined structure with 5 CNNs
 
 ####2. Attempts to reduce overfitting in the model
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting. Early stopping is used and controled by validation loss, it stops training before overfitting. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained and validated on different data sets to ensure that the model was not overfitting. Dropout layers were used in network to avoid overfitting. Train and valid loss were monitored, and model checkpoint were saved. The model used was the one with the lowest valid loss. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 ####3. Model parameter tuning
 
@@ -73,7 +75,11 @@ My first step was to use a convolution neural network model similar to LeNet. Da
 
 In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. The first mse loss was not very good.
 
-Then I added data normlization and image cropping. The model was also changed to be similar to 5 layer CNN structure in the course video. The CNN and dense layers parameters were kept as is. I chose to use batch SGD with batch size of 64. From training loss and validation loss monitoring, I found the model was overfitting after 2-4 epochs. I then used Keras early stopping to stop training before overfitting. The final training number of epochs was 4.
+Then I added data normlization and image cropping. The model was also changed to be similar to 5 layer CNN structure in the course video. The CNN and dense layers parameters were kept as is. I chose to use batch SGD with batch size of 128. From training loss and validation loss monitoring, I used Keras checkpoint to save all good models(with low valid loss). The train loss v.s. valid loss plot was monitored to make sure the model used was not overfitting. The model I picked for testing was from the last epoch in the following plot.
+
+![alt text][image5]
+
+
 
 The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track, to improve the driving behavior in these cases, I added more data, use all three camera views, and applied image flipping.
 
@@ -90,10 +96,14 @@ The final model architecture is as follows.
 | Convolution 5x5 | subsample (2,2), output channel 24, RELU |
 | Convolution 5x5 | subsample (2,2), output channel 36, RELU |
 | Convolution 5x5 | subsample (2,2), output channel 48, RELU |
+|     Dropout     |              keep prob 0.5               |
 | Convolution 3x3 | subsample (1,1), output channel 64, RELU |
 | Convolution 3x3 | subsample (1,1), output channel 64, RELU |
+|     Dropout     |              keep prob 0.5               |
 |      Dense      |             output size 100              |
+|     Dropout     |              keep prob 0.5               |
 |      Dense      |              output size 50              |
+|     Dropout     |              keep prob 0.5               |
 |      Dense      |              output size 10              |
 |      Dense      |              output size 1               |
 
